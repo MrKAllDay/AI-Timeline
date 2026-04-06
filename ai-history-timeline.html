@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The History of Artificial Intelligence: An Interactive Timeline</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0c0f1a;
+  --surface:#141828;
+  --text:#e8e6e1;
+  --muted:#8a8d9b;
+  --era1:#c97b3a;--era1-bg:rgba(201,123,58,0.12);
+  --era2:#3a9ec9;--era2-bg:rgba(58,158,201,0.12);
+  --era3:#7a5cc9;--era3-bg:rgba(122,92,201,0.12);
+  --era4:#c93a5e;--era4-bg:rgba(201,58,94,0.12);
+  --era5:#3ac97b;--era5-bg:rgba(58,201,123,0.12);
+  --era6:#c9b93a;--era6-bg:rgba(201,185,58,0.12);
+}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+.header{text-align:center;padding:3rem 1.5rem 2rem;position:relative}
+.header::after{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:80px;height:2px;background:linear-gradient(90deg,var(--era1),var(--era5))}
+.header h1{font-family:'DM Serif Display',serif;font-size:clamp(1.6rem,4vw,2.8rem);letter-spacing:-0.02em;line-height:1.2;margin-bottom:0.5rem;background:linear-gradient(135deg,#fff 0%,#b0aaa0 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.header p{color:var(--muted);font-size:0.9rem;max-width:500px;margin:0 auto}
+.legend{display:flex;flex-wrap:wrap;justify-content:center;gap:0.6rem;padding:1.5rem 1rem;max-width:900px;margin:0 auto}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:0.72rem;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);cursor:pointer;padding:4px 10px;border-radius:20px;border:1px solid transparent;transition:all 0.3s}
+.legend-item:hover,.legend-item.active{border-color:currentColor;color:var(--text)}
+.legend-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.timeline-container{position:relative;max-width:820px;margin:0 auto;padding:0 1.5rem 4rem}
+.timeline-line{position:absolute;left:50%;top:0;bottom:0;width:2px;background:linear-gradient(to bottom,transparent,#2a2d40 5%,#2a2d40 95%,transparent);transform:translateX(-50%)}
+@media(max-width:700px){.timeline-line{left:24px}}
+.event{position:relative;display:flex;align-items:flex-start;margin-bottom:1.2rem;opacity:0;transform:translateY(30px);transition:opacity 0.6s ease,transform 0.6s ease}
+.event.visible{opacity:1;transform:translateY(0)}
+.event:nth-child(odd){flex-direction:row-reverse}
+@media(max-width:700px){.event,.event:nth-child(odd){flex-direction:row}}
+.event-content{width:calc(50% - 30px);padding:0}
+@media(max-width:700px){.event-content{width:calc(100% - 56px);margin-left:8px}}
+.event-dot{position:absolute;left:50%;top:8px;width:14px;height:14px;border-radius:50%;border:2px solid var(--bg);transform:translateX(-50%);z-index:2;transition:transform 0.3s,box-shadow 0.3s}
+@media(max-width:700px){.event-dot{left:24px}}
+.event:hover .event-dot{transform:translateX(-50%) scale(1.4);box-shadow:0 0 20px currentColor}
+@media(max-width:700px){.event:hover .event-dot{transform:translateX(-50%) scale(1.4)}}
+.card{background:var(--surface);border:1px solid #1e2236;border-radius:12px;padding:1.2rem;cursor:pointer;transition:all 0.35s;position:relative;overflow:hidden}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;opacity:0.7}
+.card:hover{border-color:#2e3352;transform:translateY(-3px);box-shadow:0 8px 30px rgba(0,0,0,0.4)}
+.card-year{font-family:'DM Serif Display',serif;font-size:1.5rem;line-height:1;margin-bottom:0.3rem}
+.card-title{font-weight:700;font-size:0.95rem;margin-bottom:0.4rem;line-height:1.3}
+.card-preview{font-size:0.82rem;color:var(--muted);line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;transition:all 0.3s}
+.card.expanded .card-preview{-webkit-line-clamp:unset;overflow:visible}
+.card-pioneers{margin-top:0.6rem;display:flex;flex-wrap:wrap;gap:4px}
+.pioneer-tag{font-size:0.68rem;font-weight:600;padding:2px 8px;border-radius:10px;letter-spacing:0.02em}
+.expand-hint{font-size:0.7rem;color:var(--muted);margin-top:0.5rem;opacity:0.6;transition:opacity 0.3s}
+.card.expanded .expand-hint{opacity:0}
+.footer{text-align:center;padding:1rem;color:var(--muted);font-size:0.75rem;border-top:1px solid #1e2236;margin-top:2rem}
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>The History of Artificial Intelligence</h1>
+  <p>From Ada Lovelace's first algorithm to the generative AI revolution. Tap any event to learn more.</p>
+</div>
+
+<div class="legend" id="legend"></div>
+
+<div class="timeline-container">
+  <div class="timeline-line"></div>
+  <div id="timeline"></div>
+</div>
+
+<div class="footer">
+  Matt Karabinos | Point Park University | Module 3 Assignment | April 2026
+</div>
+
+<script>
+const eras = [
+  { id:'foundations', label:'Theoretical Foundations', color:'var(--era1)', bg:'var(--era1-bg)' },
+  { id:'early',       label:'Early AI & First Winter', color:'var(--era2)', bg:'var(--era2-bg)' },
+  { id:'revival',     label:'Revival & Second Winter', color:'var(--era3)', bg:'var(--era3-bg)' },
+  { id:'deep',        label:'Deep Learning Revolution', color:'var(--era4)', bg:'var(--era4-bg)' },
+  { id:'generative',  label:'Generative AI Era', color:'var(--era5)', bg:'var(--era5-bg)' },
+  { id:'safety',      label:'Safety & Ethics', color:'var(--era6)', bg:'var(--era6-bg)' },
+];
+
+const events = [
+  {
+    year:'1843', era:'foundations',
+    title:"Ada Lovelace Writes the First Algorithm",
+    desc:"Working with Charles Babbage's proposed Analytical Engine, Ada Lovelace published a set of notes that included a step-by-step method for computing Bernoulli numbers. It is widely recognized as the first computer program. She also foresaw that computing machines could manipulate symbols beyond numbers, anticipating artificial intelligence by more than a century. Her caution that machines cannot originate anything on their own became known as \"Lady Lovelace's Objection.\"",
+    pioneers:['Ada Lovelace','Charles Babbage']
+  },
+  {
+    year:'1950', era:'foundations',
+    title:"Turing Asks: Can Machines Think?",
+    desc:"Alan Turing published \"Computing Machinery and Intelligence\" in the journal Mind, proposing what he called the Imitation Game (now called the Turing Test). If a machine could carry on a conversation indistinguishable from a human's, Turing argued, it should be considered intelligent. The paper addressed nine objections and became one of the most cited works in computer science, with over 11,000 citations.",
+    pioneers:['Alan Turing']
+  },
+  {
+    year:'1956', era:'foundations',
+    title:"The Dartmouth Conference Names AI",
+    desc:"John McCarthy organized a summer workshop at Dartmouth College with Marvin Minsky, Claude Shannon, and Nathaniel Rochester. Their Rockefeller Foundation proposal stated that \"every aspect of learning or any other feature of intelligence can in principle be so precisely described that a machine can be made to simulate it.\" The workshop gave the field its name: artificial intelligence.",
+    pioneers:['John McCarthy','Marvin Minsky','Claude Shannon']
+  },
+  {
+    year:'1960', era:'early',
+    title:"PLATO: The First Networked Learning System",
+    desc:"Donald Bitzer created PLATO (Programmed Logic for Automatic Teaching Operations) at the University of Illinois. Beginning as a single terminal, it grew to support over 1,000 users with touch screens, plasma displays, and 7,000 hours of instructional content. PLATO also pioneered online forums, real-time chat, multiplayer games, and emoticons decades before the web.",
+    pioneers:['Donald Bitzer']
+  },
+  {
+    year:'1966', era:'early',
+    title:"ELIZA: The First Chatbot",
+    desc:"Joseph Weizenbaum at MIT created ELIZA, a program that simulated a psychotherapist by pattern-matching keywords and rephrasing user statements as questions. Some users became emotionally attached to it despite knowing it was a program. Weizenbaum was disturbed by this reaction and later became a critic of AI overreach.",
+    pioneers:['Joseph Weizenbaum']
+  },
+  {
+    year:'1974', era:'early',
+    title:"The First AI Winter Begins",
+    desc:"After years of overpromising, AI research hit a wall. The UK's Lighthill Report (1973) concluded that AI had failed to meet its goals. DARPA funding dried up under the Mansfield Amendment. The period from roughly 1974 to 1980 became the first \"AI winter,\" a era of slashed budgets and abandoned projects.",
+    pioneers:[]
+  },
+  {
+    year:'1986', era:'revival',
+    title:"Backpropagation Revives Neural Networks",
+    desc:"Geoffrey Hinton, David Rumelhart, and Ronald Williams published a landmark paper in Nature showing that backpropagation could effectively train multi-layer neural networks. This technique allowed networks to learn by adjusting connection weights layer by layer. The concept was transformational, though the hardware of the era could not yet support networks large enough to fulfill its promise.",
+    pioneers:['Geoffrey Hinton']
+  },
+  {
+    year:'1988', era:'revival',
+    title:"LeCun Builds Convolutional Neural Networks",
+    desc:"Yann LeCun developed the LeNet architecture at AT&T Bell Labs, applying convolutional neural networks to handwriting recognition. His system eventually processed over 10% of all checks deposited in U.S. banks. The work laid the foundation for modern computer vision and earned LeCun a share of the 2018 Turing Award.",
+    pioneers:['Yann LeCun']
+  },
+  {
+    year:'2011', era:'deep',
+    title:"IBM Watson Defeats Jeopardy! Champions",
+    desc:"IBM's Watson, running on 90 Power 750 servers with 200 million pages of content loaded into memory, defeated Jeopardy! champions Ken Jennings and Brad Rutter over three episodes in February 2011. Watson earned $77,147 to Jennings' $24,000. The victory demonstrated AI's ability to process natural language at speed.",
+    pioneers:[]
+  },
+  {
+    year:'2012', era:'deep',
+    title:"AlexNet Ignites the Deep Learning Era",
+    desc:"A team including Geoffrey Hinton built AlexNet, a deep convolutional neural network that dominated the ImageNet Large Scale Visual Recognition Challenge. Its error rate was nearly half that of the runner-up. The result proved that deep learning with large datasets and GPU computing could outperform traditional approaches, launching the modern AI boom.",
+    pioneers:['Geoffrey Hinton','Alex Krizhevsky','Ilya Sutskever']
+  },
+  {
+    year:'2016', era:'deep',
+    title:"AlphaGo Defeats the World Go Champion",
+    desc:"Google DeepMind's AlphaGo defeated 18-time world champion Lee Sedol four games to one in Seoul, South Korea. Over 200 million people watched online. Experts had predicted this achievement was at least a decade away. The victory demonstrated that deep reinforcement learning could master tasks requiring intuition and creativity.",
+    pioneers:['Demis Hassabis','Lee Sedol']
+  },
+  {
+    year:'2018', era:'deep',
+    title:"The \"Godfathers of AI\" Win the Turing Award",
+    desc:"Geoffrey Hinton, Yoshua Bengio, and Yann LeCun shared the ACM A.M. Turing Award for conceptual and engineering breakthroughs in deep learning. Their combined work on backpropagation, recurrent networks, convolutional networks, and representation learning formed the foundation of modern AI systems.",
+    pioneers:['Geoffrey Hinton','Yoshua Bengio','Yann LeCun']
+  },
+  {
+    year:'2019', era:'safety',
+    title:"Stuart Russell Publishes Human Compatible",
+    desc:"UC Berkeley professor Stuart Russell published Human Compatible: Artificial Intelligence and the Problem of Control. The book argued that AI systems should be designed with built-in uncertainty about human preferences, ensuring they defer to human judgment rather than pursuing fixed objectives. Russell co-authored the standard AI textbook used by over 1,500 universities.",
+    pioneers:['Stuart Russell']
+  },
+  {
+    year:'2022', era:'generative',
+    title:"ChatGPT Changes Everything",
+    desc:"On November 30, 2022, OpenAI released ChatGPT as a free research preview. Built on GPT-3.5 and fine-tuned with reinforcement learning from human feedback, it reached one million users in five days and 100 million monthly users by January 2023. It was the fastest-growing consumer application in history and forced every institution to reckon with generative AI.",
+    pioneers:[]
+  },
+  {
+    year:'2024', era:'safety',
+    title:"Hinton Wins Nobel Prize, Warns of AI Risks",
+    desc:"Geoffrey Hinton received the 2024 Nobel Prize in Physics for foundational discoveries enabling machine learning with neural networks. He had resigned from Google in May 2023 specifically to speak freely about AI dangers, estimating a 10 to 20 percent chance of AI-driven human extinction within 30 years. The pioneer who built the technology became its most prominent critic.",
+    pioneers:['Geoffrey Hinton']
+  },
+  {
+    year:'2024', era:'safety',
+    title:"IASEAI Founded to Demand AI Guardrails",
+    desc:"Stuart Russell co-founded the International Association for Safe and Ethical Artificial Intelligence (IASEAI) in Paris. Its steering committee includes Yoshua Bengio, Eric Horvitz, Max Tegmark, and other leading researchers. The inaugural 2025 conference drew 700+ participants from 65 countries. IASEAI's Ten-Point Call to Action demands binding safety standards and global cooperation on AI governance.",
+    pioneers:['Stuart Russell','Yoshua Bengio']
+  },
+  {
+    year:'2026', era:'generative',
+    title:"Melania Trump's \"Plato\" Robot Sparks Backlash",
+    desc:"First Lady Melania Trump hosted a White House summit where she walked alongside a Figure AI humanoid robot and described a vision of an AI educator called \"Plato.\" The proposal drew immediate bipartisan criticism from teachers' unions, educators, and even conservative supporters. The irony of naming a content delivery robot after the philosopher who believed education was about human formation was not lost on commentators.",
+    pioneers:[]
+  }
+];
+
+// Build legend
+const legendEl = document.getElementById('legend');
+eras.forEach(era => {
+  const item = document.createElement('div');
+  item.className = 'legend-item active';
+  item.dataset.era = era.id;
+  item.innerHTML = `<span class="legend-dot" style="background:${era.color}"></span>${era.label}`;
+  item.addEventListener('click', () => {
+    item.classList.toggle('active');
+    filterEvents();
+  });
+  legendEl.appendChild(item);
+});
+
+function filterEvents() {
+  const activeEras = [...document.querySelectorAll('.legend-item.active')].map(el => el.dataset.era);
+  document.querySelectorAll('.event').forEach(ev => {
+    ev.style.display = activeEras.includes(ev.dataset.era) ? '' : 'none';
+  });
+}
+
+// Build timeline
+const timelineEl = document.getElementById('timeline');
+events.forEach((ev, i) => {
+  const era = eras.find(e => e.id === ev.era);
+  const div = document.createElement('div');
+  div.className = 'event';
+  div.dataset.era = ev.era;
+  
+  const pioneersHTML = ev.pioneers.length 
+    ? `<div class="card-pioneers">${ev.pioneers.map(p => `<span class="pioneer-tag" style="background:${era.bg};color:${era.color}">${p}</span>`).join('')}</div>` 
+    : '';
+
+  div.innerHTML = `
+    <div class="event-content">
+      <div class="card" style="--era-color:${era.color}" onclick="this.classList.toggle('expanded')">
+        <div style="position:absolute;top:0;left:0;right:0;height:3px;background:${era.color};opacity:0.7"></div>
+        <div class="card-year" style="color:${era.color}">${ev.year}</div>
+        <div class="card-title">${ev.title}</div>
+        <div class="card-preview">${ev.desc}</div>
+        ${pioneersHTML}
+        <div class="expand-hint">tap to read more</div>
+      </div>
+    </div>
+    <div class="event-dot" style="background:${era.color};color:${era.color}"></div>
+  `;
+  
+  timelineEl.appendChild(div);
+});
+
+// Scroll reveal
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.15, rootMargin: '0px 0px -50px 0px' });
+
+document.querySelectorAll('.event').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
